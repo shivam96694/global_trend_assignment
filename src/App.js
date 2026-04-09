@@ -5,7 +5,12 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
-
+const [filter, setFilter] = useState("all");
+const filteredTasks = tasks.filter(task => {
+  if (filter === "completed") return task.completed;
+  if (filter === "pending") return !task.completed;
+  return true;
+});
   const fetchTasks = async () => {
     setLoading(true);
     try {
@@ -22,8 +27,10 @@ function App() {
   }, []);
 
   const handleAdd = async () => {
-    if (!title) return alert("Enter task title");
-    await addTask({ title });
+if (!title.trim()) {
+  alert("Enter valid task");
+  return;
+}    await addTask({ title });
     setTitle("");
     fetchTasks();
   };
@@ -50,9 +57,14 @@ function App() {
       <button onClick={handleAdd}>Add</button>
 
       {loading && <p>Loading...</p>}
-
+{filteredTasks.length === 0 && !loading && <p>No tasks yet</p>}
+<div style={{ marginTop: 10 }}>
+  <button onClick={() => setFilter("all")}>All</button>
+  <button onClick={() => setFilter("completed")} style={{ marginLeft: 5 }}>Completed</button>
+  <button onClick={() => setFilter("pending")} style={{ marginLeft: 5 }}>Pending</button>
+</div>
      <TaskList
-  tasks={tasks}
+  tasks={filteredTasks}
   onToggle={handleToggle}
   onDelete={handleDelete}
 />
